@@ -17,20 +17,24 @@ class Lesson implements EntityInterface
     #[ORM\GeneratedValue(strategy: 'IDENTITY')]
     private ?int $id = null;
 
-    #[ORM\Column(type: 'string', length: 32, nullable: false)]
+    #[ORM\Column(length: 32, nullable: false)]
     private string $title;
 
     #[ORM\OneToMany(targetEntity: Task::class, mappedBy: 'lesson')]
     private Collection $tasks;
 
-    #[ORM\Column(name: 'created_at', type: 'datetime', nullable: false)]
+    #[ORM\Column(name: 'created_at', nullable: false)]
     private DateTime $createdAt;
 
-    #[ORM\Column(name: 'updated_at', type: 'datetime', nullable: false)]
+    #[ORM\Column(name: 'updated_at', nullable: false)]
     private DateTime $updatedAt;
 
-    public function __construct()
+    public function __construct(
+        string $title,
+    )
     {
+        $this->title = $title;
+
         $this->tasks = new ArrayCollection();
         $this->createdAt = new DateTime();
         $this->updatedAt = new DateTime();
@@ -39,11 +43,6 @@ class Lesson implements EntityInterface
     public function getId(): int
     {
         return $this->id;
-    }
-
-    public function setId(int $id): void
-    {
-        $this->id = $id;
     }
 
     public function getTitle(): string
@@ -58,11 +57,6 @@ class Lesson implements EntityInterface
 
     public function getCreatedAt(): DateTime {
         return $this->createdAt;
-    }
-
-    #[ORM\PrePersist]
-    public function setCreatedAt(): void {
-        $this->createdAt = new DateTime();
     }
 
     public function getUpdatedAt(): DateTime {
@@ -80,7 +74,20 @@ class Lesson implements EntityInterface
         return [
             'id' => $this->id,
             'title' => $this->title,
-            'tasks' => array_map(static fn(Task $task) => $task->toArray(), $this->tasks->toArray()),
+            /**
+             * A circular reference has been detected when serializing the object of class "App\Domain\Entity\Lesson" (configured limit: 1)
+             * 'tasks' => array_map(static fn(Task $task) => $task->toArray(), $this->tasks->toArray()),
+             */
+            'createdAt' => $this->createdAt->format('Y-m-d H:i:s'),
+            'updatedAt' => $this->updatedAt->format('Y-m-d H:i:s'),
+        ];
+    }
+
+    public function getInfo(): array
+    {
+        return [
+            'id' => $this->id,
+            'title' => $this->title,
             'createdAt' => $this->createdAt->format('Y-m-d H:i:s'),
             'updatedAt' => $this->updatedAt->format('Y-m-d H:i:s'),
         ];

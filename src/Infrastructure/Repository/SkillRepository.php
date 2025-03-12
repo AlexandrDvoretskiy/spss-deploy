@@ -14,4 +14,23 @@ class SkillRepository extends AbstractRepository
     {
         return $this->store($skill);
     }
+
+    public function find(int $id): ?Skill
+    {
+        return $this->entityManager->getRepository(Skill::class)->find($id);
+    }
+
+    public function deleteSkillIfExists(int $id): bool
+    {
+        $skill = $this->find($id);
+
+        if ($skill instanceof Skill) {
+            $this->remove($skill);
+            $this->flush();
+
+            return true;
+        }
+
+        return false;
+    }
 }

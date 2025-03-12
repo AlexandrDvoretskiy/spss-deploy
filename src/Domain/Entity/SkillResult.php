@@ -11,8 +11,7 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity]
 #[ORM\HasLifecycleCallbacks]
 #[ORM\Index(name: 'skill_result__user_id__ind', columns: ['user_id'])]
-#[ORM\Index(name: 'skill_result__task_id__ind', columns: ['task_id'])]
-#[ORM\Index(name: 'skill_result__skill_id__ind', columns: ['skill_id'])]
+#[ORM\Index(name: 'skill_result__skill_range__ind', columns: ['skill_range'])]
 class SkillResult implements EntityInterface
 {
     #[ORM\Column(name: 'id', type: 'bigint', unique: true)]
@@ -24,25 +23,28 @@ class SkillResult implements EntityInterface
     #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id')]
     private User $user;
 
-    #[ORM\ManyToOne(targetEntity: Task::class , inversedBy: 'skillResults')]
-    #[ORM\JoinColumn(name: 'task_id', referencedColumnName: 'id')]
-    private Task $task;
+    #[ORM\ManyToOne(targetEntity: SkillRange::class , inversedBy: 'results')]
+    #[ORM\JoinColumn(name: 'skill_range', referencedColumnName: 'id')]
+    private SkillRange $skillRange;
 
-    #[ORM\ManyToOne(targetEntity: Skill::class , inversedBy: 'results')]
-    #[ORM\JoinColumn(name: 'skill_id', referencedColumnName: 'id')]
-    private Skill $skill;
-
-    #[ORM\Column(type: 'float', nullable: false)]
+    #[ORM\Column(nullable: false)]
     private float $result;
 
-    #[ORM\Column(name: 'created_at', type: 'datetime', nullable: false)]
+    #[ORM\Column(name: 'created_at', nullable: false)]
     private DateTime $createdAt;
 
-    #[ORM\Column(name: 'updated_at', type: 'datetime', nullable: false)]
+    #[ORM\Column(name: 'updated_at', nullable: false)]
     private DateTime $updatedAt;
 
-    public function __construct()
+    public function __construct(
+        User $user,
+        SkillRange $skillRange,
+        float $result
+    )
     {
+        $this->user = $user;
+        $this->skillRange = $skillRange;
+        $this->result = $result;
         $this->createdAt = new DateTime();
         $this->updatedAt = new DateTime();
     }
@@ -52,16 +54,10 @@ class SkillResult implements EntityInterface
         return $this->id;
     }
 
-    public function setId(int $id): void
-    {
-        $this->id = $id;
-    }
-
     public function getCreatedAt(): DateTime {
         return $this->createdAt;
     }
 
-    #[ORM\PrePersist]
     public function setCreatedAt(): void {
         $this->createdAt = new DateTime();
     }
@@ -80,45 +76,12 @@ class SkillResult implements EntityInterface
     {
         return [
             'id' => $this->id,
-            'user' => $this->user,
-            'task' => $this->task,
-            'skill' => $this->skill,
+            'user' => $this->getUser(),
+            'skillRange' => $this->getSkillRange(),
             'result' => $this->result,
             'createdAt' => $this->createdAt->format('Y-m-d H:i:s'),
             'updatedAt' => $this->updatedAt->format('Y-m-d H:i:s'),
         ];
-    }
-
-    /**
-     * @return Task
-     */
-    public function getTask(): Task
-    {
-        return $this->task;
-    }
-
-    /**
-     * @param Task $task
-     */
-    public function setTask(Task $task): void
-    {
-        $this->task = $task;
-    }
-
-    /**
-     * @return Skill
-     */
-    public function getSkill(): Skill
-    {
-        return $this->skill;
-    }
-
-    /**
-     * @param Skill $skill
-     */
-    public function setSkill(Skill $skill): void
-    {
-        $this->skill = $skill;
     }
 
     /**
@@ -140,18 +103,11 @@ class SkillResult implements EntityInterface
     /**
      * @return User
      */
-    public function getUser(): User
+    public function getUser(): array
     {
-        return $this->user;
+        return $this->user->getInfo();
     }
 
-    /**
-     * @param User $user
-     */
-    public function setUser(User $user): void
-    {
-        $this->user = $user;
-    }
 
     /**
      * @return float
@@ -167,5 +123,13 @@ class SkillResult implements EntityInterface
     public function setResult(float $result): void
     {
         $this->result = $result;
+    }
+
+    /**
+     * @return SkillRange
+     */
+    public function getSkillRange(): array
+    {
+        return $this->skillRange->getInfo();
     }
 }

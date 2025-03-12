@@ -38,4 +38,9 @@ abstract class AbstractRepository
     {
         $this->entityManager->refresh($entity);
     }
+
+    public function remove(EntityInterface $entity): void
+    {
+        $this->entityManager->remove($entity);
+    }
 }

@@ -1,0 +1,34 @@
+<?php
+
+namespace App\Controller\Web\Skill\Get\v1;
+
+use App\Domain\Entity\Skill;
+use Symfony\Component\HttpKernel\Attribute\AsController;
+use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
+
+#[AsController]
+class Controller
+{
+    public function __construct(
+        private readonly Manager $manager,
+    ) {
+    }
+
+    #[Route(path: 'api/skill/v1/', methods: ['GET'])]
+    public function __invoke(Request $request): Response
+    {
+        $id = $request->query->get("id");
+        if (is_numeric($id)) {
+            $skill = $this->manager->findById($id);
+
+            if ($skill instanceof Skill) {
+                return new JsonResponse($skill->toArray());
+            }
+        }
+
+        return new JsonResponse(null, Response::HTTP_NOT_FOUND);
+    }
+}

@@ -17,7 +17,7 @@ class User implements EntityInterface
     #[ORM\GeneratedValue(strategy: 'IDENTITY')]
     private ?int $id = null;
 
-    #[ORM\Column(type: 'string', length: 32, nullable: false)]
+    #[ORM\Column(length: 32, nullable: false)]
     private string $login;
 
     #[ORM\OneToMany(targetEntity: Mark::class, mappedBy: 'user')]
@@ -26,14 +26,18 @@ class User implements EntityInterface
     #[ORM\OneToMany(targetEntity: SkillResult::class, mappedBy: 'user')]
     private Collection $skillResults;
 
-    #[ORM\Column(name: 'created_at', type: 'datetime', nullable: false)]
+    #[ORM\Column(name: 'created_at', nullable: false)]
     private DateTime $createdAt;
 
-    #[ORM\Column(name: 'updated_at', type: 'datetime', nullable: false)]
+    #[ORM\Column(name: 'updated_at', nullable: false)]
     private DateTime $updatedAt;
 
-    public function __construct()
+    public function __construct(
+        string $login,
+    )
     {
+        $this->login = $login;
+
         $this->marks = new ArrayCollection();
         $this->skillResults = new ArrayCollection();
         $this->createdAt = new DateTime();
@@ -43,11 +47,6 @@ class User implements EntityInterface
     public function getId(): int
     {
         return $this->id;
-    }
-
-    public function setId(int $id): void
-    {
-        $this->id = $id;
     }
 
     public function getLogin(): string
@@ -64,7 +63,6 @@ class User implements EntityInterface
         return $this->createdAt;
     }
 
-    #[ORM\PrePersist]
     public function setCreatedAt(): void {
         $this->createdAt = new DateTime();
     }
@@ -90,26 +88,18 @@ class User implements EntityInterface
             'skillResults' => array_map(static fn(SkillResult $result) => $result->toArray(), $this->skillResults->toArray()),
             'createdAt' => $this->createdAt->format('Y-m-d H:i:s'),
             'updatedAt' => $this->updatedAt->format('Y-m-d H:i:s'),
+        ];
+    }
 
-//            'tweets' => array_map(static fn(Tweet $tweet) => $tweet->toArray(), $this->tweets->toArray()),
-//            'followers' => array_map(static fn(User $user) => $user->getLogin(), $this->followers->toArray()),
-//            'authors' => array_map(static fn(User $user) => $user->getLogin(), $this->authors->toArray()),
-//            'subscriptionFollowers' => array_map(
-//                static fn(Subscription $subscription) => [
-//                    'subscriptionId' => $subscription->getId(),
-//                    'userId' => $subscription->getFollower()->getId(),
-//                    'login' => $subscription->getFollower()->getLogin(),
-//                ],
-//                $this->subscriptionFollowers->toArray()
-//            ),
-//            'subscriptionAuthors' => array_map(
-//                static fn(Subscription $subscription) => [
-//                    'subscriptionId' => $subscription->getId(),
-//                    'userId' => $subscription->getAuthor()->getId(),
-//                    'login' => $subscription->getAuthor()->getLogin(),
-//                ],
-//                $this->subscriptionAuthors->toArray()
-//            ),
+    public function getInfo(): array
+    {
+        return [
+            'id' => $this->id,
+            'login' => $this->login,
+//            'marks' => array_map(static fn(Mark $mark) => $mark->toArray(), $this->marks->toArray()),
+//            'skillResults' => array_map(static fn(SkillResult $result) => $result->toArray(), $this->skillResults->toArray()),
+            'createdAt' => $this->createdAt->format('Y-m-d H:i:s'),
+            'updatedAt' => $this->updatedAt->format('Y-m-d H:i:s'),
         ];
     }
 
