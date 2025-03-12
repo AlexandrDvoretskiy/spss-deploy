@@ -2,8 +2,8 @@
 
 namespace App\Controller\Web\User\Create\v1;
 
-use App\Controller\Web\CreateUser\v1\Input\CreateUserDTO;
-use App\Controller\Web\CreateUser\v1\Output\CreatedUserDTO;
+use App\Controller\Web\User\Create\v1\Input\CreateUserDTO;
+use App\Controller\Web\User\Create\v1\Output\CreatedUserDTO;
 use App\Domain\Entity\EmailUser;
 use App\Domain\Entity\PhoneUser;
 use App\Domain\Entity\User;
