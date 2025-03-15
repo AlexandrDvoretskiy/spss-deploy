@@ -34,20 +34,23 @@ class Task implements EntityInterface
     #[ORM\OneToMany(targetEntity: SkillRange::class, mappedBy: 'task')]
     private Collection $ranges;
 
-    #[ORM\OneToMany(targetEntity: SkillResult::class, mappedBy: 'task')]
-    private Collection $skillResults;
-
-    #[ORM\Column(name: 'created_at', type: 'datetime', nullable: false)]
+    #[ORM\Column(name: 'created_at', nullable: false)]
     private DateTime $createdAt;
 
-    #[ORM\Column(name: 'updated_at', type: 'datetime', nullable: false)]
+    #[ORM\Column(name: 'updated_at', nullable: false)]
     private DateTime $updatedAt;
 
-    public function __construct()
+    public function __construct(
+        string $title,
+        Lesson $lesson
+    )
     {
+        $this->title = $title;
+        $this->lesson = $lesson;
+
+        $this->skills = new ArrayCollection();
         $this->marks = new ArrayCollection();
         $this->ranges = new ArrayCollection();
-        $this->skillResults = new ArrayCollection();
         $this->createdAt = new DateTime();
         $this->updatedAt = new DateTime();
     }
@@ -55,11 +58,6 @@ class Task implements EntityInterface
     public function getId(): int
     {
         return $this->id;
-    }
-
-    public function setId(int $id): void
-    {
-        $this->id = $id;
     }
 
     public function getTitle(): string
@@ -76,7 +74,6 @@ class Task implements EntityInterface
         return $this->createdAt;
     }
 
-    #[ORM\PrePersist]
     public function setCreatedAt(): void {
         $this->createdAt = new DateTime();
     }
@@ -96,10 +93,22 @@ class Task implements EntityInterface
         return [
             'id' => $this->id,
             'title' => $this->title,
-            'lesson' => $this->lesson,
+            'lesson' => $this->getLesson(),
             'skills' => array_map(static fn(Skill $skill) => $skill->toArray(), $this->skills->toArray()),
             'ranges' => array_map(static fn(SkillRange $range) => $range->toArray(), $this->ranges->toArray()),
-            'skillResults' => array_map(static fn(SkillResult $result) => $result->toArray(), $this->skillResults->toArray()),
+            'createdAt' => $this->createdAt->format('Y-m-d H:i:s'),
+            'updatedAt' => $this->updatedAt->format('Y-m-d H:i:s'),
+        ];
+    }
+
+    public function getInfo(): array
+    {
+        return [
+            'id' => $this->id,
+            'title' => $this->title,
+            'lesson' => $this->getLesson(),
+            // 'skills' => array_map(static fn(Skill $skill) => $skill->toArray(), $this->skills->toArray()),
+            // 'ranges' => array_map(static fn(SkillRange $range) => $range->toArray(), $this->ranges->toArray()),
             'createdAt' => $this->createdAt->format('Y-m-d H:i:s'),
             'updatedAt' => $this->updatedAt->format('Y-m-d H:i:s'),
         ];
@@ -108,17 +117,9 @@ class Task implements EntityInterface
     /**
      * @return Lesson
      */
-    public function getLesson(): Lesson
+    public function getLesson(): array
     {
-        return $this->lesson;
-    }
-
-    /**
-     * @param Lesson $lesson
-     */
-    public function setLesson(Lesson $lesson): void
-    {
-        $this->lesson = $lesson;
+        return $this->lesson->getInfo();
     }
 
     public function addSkill(Skill $skill): void
@@ -131,9 +132,9 @@ class Task implements EntityInterface
     /**
      * @return Collection
      */
-    public function getSkills(): Collection
+    public function getSkills(): array
     {
-        return $this->skills;
+        return array_map(static fn(Skill $skill) => $skill->toArray(), $this->skills->toArray());
     }
 
     /**
@@ -147,9 +148,9 @@ class Task implements EntityInterface
     /**
      * @return Collection
      */
-    public function getMarks(): Collection
+    public function getMarks(): array
     {
-        return $this->marks;
+        return array_map(static fn(Mark $mark) => $mark->toArray(), $this->marks->toArray());
     }
 
     /**
@@ -165,9 +166,9 @@ class Task implements EntityInterface
     /**
      * @return Collection
      */
-    public function getRanges(): Collection
+    public function getRanges(): array
     {
-        return $this->ranges;
+        return array_map(static fn(SkillRange $skillRange) => $skillRange->toArray(), $this->ranges->toArray());
     }
 
     /**
@@ -177,24 +178,6 @@ class Task implements EntityInterface
     {
         if (!$this->ranges->contains($range)) {
             $this->ranges->add($range);
-        }
-    }
-
-    /**
-     * @return Collection
-     */
-    public function getSkillResults(): Collection
-    {
-        return $this->skillResults;
-    }
-
-    /**
-     * @param Collection $skillResult
-     */
-    public function setSkillResults(Collection $skillResult): void
-    {
-        if (!$this->skillResults->contains($skillResult)) {
-            $this->skillResults->add($skillResult);
         }
     }
 }

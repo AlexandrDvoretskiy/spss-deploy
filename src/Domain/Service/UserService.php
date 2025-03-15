@@ -3,6 +3,7 @@
 namespace App\Domain\Service;
 
 use App\Domain\Entity\User;
+use App\Domain\Model\CreateUserModel;
 use App\Infrastructure\Repository\UserRepository;
 
 class UserService
@@ -11,10 +12,11 @@ class UserService
     {
     }
 
-    public function create(string $login): User
+    public function create(CreateUserModel $createUserModel): User
     {
-        $user = new User();
-        $user->setLogin($login);
+        $user = new User(
+            $createUserModel->login
+        );
         $this->userRepository->create($user);
 
         return $user;
@@ -22,7 +24,17 @@ class UserService
 
     public function findUserByLogin(string $login): array
     {
-        return $this->userRepository->findUserByLogin($login);
+        $user = $this->userRepository->findUserByLogin($login);
+    }
+
+    public function findUserById(int $id): ?User
+    {
+        return $this->userRepository->find($id);
+    }
+
+    public function deleteUserIfExists(int $id): bool
+    {
+        return $this->userRepository->deleteUserIfExists($id);
     }
 
 

@@ -3,16 +3,40 @@
 namespace App\Domain\Service;
 
 use App\Domain\Entity\SkillResult;
+use App\Domain\Model\CreateSkillResultModel;
 use App\Infrastructure\Repository\SkillResultRepository;
 
 class SkillResultService
 {
-    public function __construct(private readonly SkillResultRepository $skillResultRepository)
+    public function __construct(
+        private readonly SkillResultRepository $skillResultRepository,
+        private readonly UserService $userService,
+        private readonly SkillRangeService $skillRangeService
+    )
     {
     }
 
-    public function create(): SkillResult
+    public function create(CreateSkillResultModel $createSkillRangeModel): SkillResult
     {
+        $skillResult = new SkillResult(
+            $this->userService->findUserById($createSkillRangeModel->user),
+            $this->skillRangeService->findById($createSkillRangeModel->skillRange),
+            $createSkillRangeModel->result
+        );
+
+        $this->skillResultRepository->create($skillResult);
+
+        return $skillResult;
+    }
+
+    public function findById(int $id): SkillResult
+    {
+        return $this->skillResultRepository->find($id);
+    }
+
+    public function deleteSkillResultIfExists(int $id): bool
+    {
+        return $this->skillResultRepository->deleteSkillResultIfExists($id);
 
     }
 }

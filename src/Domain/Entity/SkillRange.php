@@ -27,17 +27,27 @@ class SkillRange implements EntityInterface
     #[ORM\JoinColumn(name: 'skill_id', referencedColumnName: 'id')]
     private Skill $skill;
 
-    #[ORM\Column(type: 'integer', nullable: false)]
+    #[ORM\Column(nullable: false)]
     private int $range;
 
-    #[ORM\Column(name: 'created_at', type: 'datetime', nullable: false)]
+    #[ORM\OneToMany(targetEntity: SkillResult::class, mappedBy: 'skillRange')]
+    private Collection $results;
+
+    #[ORM\Column(name: 'created_at', nullable: false)]
     private DateTime $createdAt;
 
-    #[ORM\Column(name: 'updated_at', type: 'datetime', nullable: false)]
+    #[ORM\Column(name: 'updated_at', nullable: false)]
     private DateTime $updatedAt;
 
-    public function __construct()
+    public function __construct(
+        Skill $skill,
+        Task $task,
+        int $range
+    )
     {
+        $this->skill = $skill;
+        $this->task = $task;
+        $this->range = $range;
         $this->createdAt = new DateTime();
         $this->updatedAt = new DateTime();
     }
@@ -47,18 +57,8 @@ class SkillRange implements EntityInterface
         return $this->id;
     }
 
-    public function setId(int $id): void
-    {
-        $this->id = $id;
-    }
-
     public function getCreatedAt(): DateTime {
         return $this->createdAt;
-    }
-
-    #[ORM\PrePersist]
-    public function setCreatedAt(): void {
-        $this->createdAt = new DateTime();
     }
 
     public function getUpdatedAt(): DateTime {
@@ -75,8 +75,20 @@ class SkillRange implements EntityInterface
     {
         return [
             'id' => $this->id,
-            'task' => $this->task,
-            'skill' => $this->skill,
+            'skill' => $this->getSkill(),
+            'task' => $this->getTask(),
+            'range' => $this->range,
+            'createdAt' => $this->createdAt->format('Y-m-d H:i:s'),
+            'updatedAt' => $this->updatedAt->format('Y-m-d H:i:s'),
+        ];
+    }
+
+    public function getInfo(): array
+    {
+        return [
+            'id' => $this->id,
+             'skill' => $this->getSkill(),
+             'task' => $this->getTask(),
             'range' => $this->range,
             'createdAt' => $this->createdAt->format('Y-m-d H:i:s'),
             'updatedAt' => $this->updatedAt->format('Y-m-d H:i:s'),
@@ -86,33 +98,17 @@ class SkillRange implements EntityInterface
     /**
      * @return Task
      */
-    public function getTask(): Task
+    public function getTask(): array
     {
-        return $this->task;
-    }
-
-    /**
-     * @param Task $task
-     */
-    public function setTask(Task $task): void
-    {
-        $this->task = $task;
+        return $this->task->getInfo();
     }
 
     /**
      * @return Skill
      */
-    public function getSkill(): Skill
+    public function getSkill(): array
     {
-        return $this->skill;
-    }
-
-    /**
-     * @param Skill $skill
-     */
-    public function setSkill(Skill $skill): void
-    {
-        $this->skill = $skill;
+        return $this->skill->getInfo();
     }
 
     /**
@@ -124,10 +120,10 @@ class SkillRange implements EntityInterface
     }
 
     /**
-     * @param int $range
+     * @return Collection
      */
-    public function setRange(int $range): void
+    public function getResults(): Collection
     {
-        $this->range = $range;
+        return $this->results;
     }
 }

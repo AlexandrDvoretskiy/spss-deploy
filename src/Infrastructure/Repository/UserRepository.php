@@ -28,4 +28,23 @@ class UserRepository extends AbstractRepository
 
         return $queryBuilder->getQuery()->getResult();
     }
+
+    public function find(int $id): ?User
+    {
+        return $this->entityManager->getRepository(User::class)->find($id);
+    }
+
+    public function deleteUserIfExists(int $id): bool
+    {
+        $user = $this->find($id);
+
+        if ($user instanceof User) {
+            $this->remove($user);
+            $this->flush();
+
+            return true;
+        }
+
+        return false;
+    }
 }

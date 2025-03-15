@@ -1,6 +1,5 @@
 <?php
-// CREATE INDEX IF NOT EXISTS CONCURRENTLY
-// DROP IF EXISTS
+
 namespace App\Domain\Entity;
 
 use DateTime;
@@ -28,17 +27,25 @@ class Mark implements EntityInterface
     #[ORM\JoinColumn(name: 'task_id', referencedColumnName: 'id')]
     private Task $task;
 
-    #[ORM\Column(type: 'integer', nullable: false)]
+    #[ORM\Column(nullable: false)]
     private int $mark;
 
-    #[ORM\Column(name: 'created_at', type: 'datetime', nullable: false)]
+    #[ORM\Column(name: 'created_at', nullable: false)]
     private DateTime $createdAt;
 
-    #[ORM\Column(name: 'updated_at', type: 'datetime', nullable: false)]
+    #[ORM\Column(name: 'updated_at', nullable: false)]
     private DateTime $updatedAt;
 
-    public function __construct()
+    public function __construct(
+        int $mark,
+        User $user,
+        Task $task,
+    )
     {
+        $this->mark = $mark;
+        $this->user = $user;
+        $this->task = $task;
+
         $this->createdAt = new DateTime();
         $this->updatedAt = new DateTime();
     }
@@ -48,16 +55,10 @@ class Mark implements EntityInterface
         return $this->id;
     }
 
-    public function setId(int $id): void
-    {
-        $this->id = $id;
-    }
-
     public function getCreatedAt(): DateTime {
         return $this->createdAt;
     }
 
-    #[ORM\PrePersist]
     public function setCreatedAt(): void {
         $this->createdAt = new DateTime();
     }
@@ -76,9 +77,9 @@ class Mark implements EntityInterface
     {
         return [
             'id' => $this->id,
-            'user' => $this->user,
-            'task' => $this->task,
             'mark' => $this->mark,
+            'user' => $this->user->getInfo(),
+            'task' => $this->task->getInfo(),
             'createdAt' => $this->createdAt->format('Y-m-d H:i:s'),
             'updatedAt' => $this->updatedAt->format('Y-m-d H:i:s'),
         ];
@@ -87,9 +88,9 @@ class Mark implements EntityInterface
     /**
      * @return Task
      */
-    public function getTask(): Task
+    public function getTask(): array
     {
-        return $this->task;
+        return $this->task->getInfo();
     }
 
     /**
@@ -119,9 +120,9 @@ class Mark implements EntityInterface
     /**
      * @return User
      */
-    public function getUser(): User
+    public function getUser(): array
     {
-        return $this->user;
+        return $this->user->getInfo();
     }
 
     /**
