@@ -7,6 +7,7 @@ use App\Controller\Web\Mark\Create\v1\Output\CreatedMarkDTO;
 use Symfony\Component\HttpKernel\Attribute\AsController;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[AsController]
 class Controller
@@ -16,6 +17,7 @@ class Controller
     ) {
     }
 
+    #[IsGranted("ROLE_ADMIN")]
     #[Route(path: "api/mark/v1/", methods: ["POST"])]
     public function __invoke(#[MapRequestPayload] CreateMarkDTO $createMarkDTO): CreatedMarkDTO
     {

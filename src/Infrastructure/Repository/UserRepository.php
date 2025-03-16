@@ -16,7 +16,7 @@ class UserRepository extends AbstractRepository
         return $this->store($user);
     }
 
-    public function findUserByLogin(string $login): array
+    public function findUserByLogin(string $login): ?User
     {
         $queryBuilder = $this->entityManager->createQueryBuilder();
         $queryBuilder->select('u')
@@ -24,9 +24,9 @@ class UserRepository extends AbstractRepository
             ->andWhere(
                 $queryBuilder->expr()->eq('u.login',':userLogin')
             )
-            ->setParameter('userLogin', "$login");
+            ->setParameter('userLogin', $login);
 
-        return $queryBuilder->getQuery()->getResult();
+        return $queryBuilder->getQuery()->getOneOrNullResult();
     }
 
     public function find(int $id): ?User
@@ -46,5 +46,38 @@ class UserRepository extends AbstractRepository
         }
 
         return false;
+    }
+
+    public function updateToken(int $id, ?string $token = null): ?string
+    {
+        $queryBuilder = $this->entityManager->createQueryBuilder();
+        $queryBuilder->update(User::class, "u")
+            ->setParameter("id", $id)
+            ->setParameter("token", $token)
+            ->set("u.token", ":token")
+            ->where(
+                $queryBuilder->expr()->eq("u.id", ":id")
+            );
+        $queryBuilder->getQuery()->execute();
+
+        return $token;
+    }
+
+    public function generateToken(): string
+    {
+        return base64_encode(random_bytes(20));
+    }
+
+    public function findUserByToken(string $token): ?User
+    {
+        /** @var User|null $user */
+        $user = $this->entityManager->getRepository(User::class)->findOneBy(['token' => $token]);
+
+        return $user;
+    }
+
+    public function clearUserToken($id): void
+    {
+        $this->updateToken($id, null);
     }
 }

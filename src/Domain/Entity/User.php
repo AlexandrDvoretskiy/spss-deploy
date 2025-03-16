@@ -2,15 +2,18 @@
 
 namespace App\Domain\Entity;
 
+use App\Domain\ValueObject\RoleEnum;
 use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 #[ORM\Table(name: '`user`')]
 #[ORM\Entity]
 #[ORM\HasLifecycleCallbacks]
-class User implements EntityInterface
+class User implements EntityInterface, UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Column(name: 'id', type: 'bigint', unique: true)]
     #[ORM\Id]
@@ -26,6 +29,15 @@ class User implements EntityInterface
     #[ORM\OneToMany(targetEntity: SkillResult::class, mappedBy: 'user')]
     private Collection $skillResults;
 
+    #[ORM\Column(type: 'json', length: 1024, nullable: false)]
+    private array $roles = [];
+
+    #[ORM\Column(nullable: false)]
+    private string $password;
+
+    #[ORM\Column(length: 32, unique: true, nullable: true)]
+    private ?string $token = null;
+
     #[ORM\Column(name: 'created_at', nullable: false)]
     private DateTime $createdAt;
 
@@ -34,9 +46,11 @@ class User implements EntityInterface
 
     public function __construct(
         string $login,
+        array $roles
     )
     {
         $this->login = $login;
+        $this->roles = $roles;
 
         $this->marks = new ArrayCollection();
         $this->skillResults = new ArrayCollection();
@@ -137,5 +151,54 @@ class User implements EntityInterface
         if (!$this->skillResults->contains($skillResult)) {
             $this->skillResults->add($skillResult);
         }
+    }
+
+    public function getPassword(): string
+    {
+        return $this->password;
+    }
+
+    public function setPassword(string $password): void
+    {
+        $this->password = $password;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getRoles(): array
+    {
+        $roles = $this->roles;
+        // guarantee every user at least has ROLE_USER
+        $roles[] = RoleEnum::ROLE_USER->value;
+
+        return array_unique($roles);
+    }
+
+    /**
+     * @param string[] $roles
+     */
+    public function setRoles(array $roles): void
+    {
+        $this->roles = $roles;
+    }
+
+    public function eraseCredentials(): void
+    {
+    }
+
+    public function getUserIdentifier(): string
+    {
+        return $this->login;
+    }
+
+    public function getToken(): ?string
+    {
+        return $this->token;
+    }
+
+    public function setToken(?string $token): void
+    {
+        $this->token = $token;
     }
 }
