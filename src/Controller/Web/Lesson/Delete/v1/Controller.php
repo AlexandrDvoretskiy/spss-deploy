@@ -7,6 +7,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\AsController;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[AsController]
 class Controller
@@ -16,6 +17,7 @@ class Controller
     ) {
     }
 
+    #[IsGranted("ROLE_ADMIN")]
     #[Route(path: 'api/lesson/v1/{id}/', requirements: ['id' => '\d+'], methods: ['DELETE'])]
     public function __invoke(int $id): Response
     {
