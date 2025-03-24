@@ -2,6 +2,18 @@
 
 namespace App\Domain\Entity;
 
+use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Metadata\ApiFilter;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\Post;
+use App\Domain\ApiPlatform\DTO\Input\CreateUserDTO;
+use App\Domain\ApiPlatform\DTO\Output\CreatedUserDTO;
+use App\Domain\ApiPlatform\State\UserDeleteProcessor;
+use App\Domain\ApiPlatform\State\UserProcessor;
+use App\Domain\ApiPlatform\State\UserProviderDecorator;
 use App\Domain\ValueObject\RoleEnum;
 use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -13,6 +25,12 @@ use Symfony\Component\Security\Core\User\UserInterface;
 #[ORM\Table(name: '`user`')]
 #[ORM\Entity]
 #[ORM\HasLifecycleCallbacks]
+#[ApiResource]
+#[Post(input: CreateUserDTO::class, output: CreatedUserDTO::class, processor: UserProcessor::class)]
+#[Get(output: CreatedUserDTO::class, provider: UserProviderDecorator::class)]
+#[Delete(processor: UserDeleteProcessor::class)]
+#[ApiFilter(SearchFilter::class, properties: ['login' => 'partial'])]
+#[ApiFilter(OrderFilter::class, properties: ['id', 'title'])]
 class User implements EntityInterface, UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Column(name: 'id', type: 'bigint', unique: true)]

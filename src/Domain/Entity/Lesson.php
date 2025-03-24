@@ -2,6 +2,10 @@
 
 namespace App\Domain\Entity;
 
+use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Metadata\ApiFilter;
+use ApiPlatform\Metadata\ApiResource;
 use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -10,6 +14,9 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Table(name: 'lesson')]
 #[ORM\Entity]
 #[ORM\HasLifecycleCallbacks]
+#[ApiResource]
+#[ApiFilter(SearchFilter::class, properties: ['title' => 'partial'])]
+#[ApiFilter(OrderFilter::class, properties: ['id', 'title'])]
 class Lesson implements EntityInterface
 {
     #[ORM\Column(name: 'id', type: 'bigint', unique: true)]

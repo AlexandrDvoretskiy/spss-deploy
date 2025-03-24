@@ -4,13 +4,9 @@ namespace App\Controller\Web\User\Create\v2;
 
 use App\Controller\Web\User\Create\v2\Input\CreateUserDTO;
 use App\Controller\Web\User\Create\v2\Output\CreatedUserDTO;
-use App\Domain\Entity\EmailUser;
-use App\Domain\Entity\PhoneUser;
-use App\Domain\Entity\User;
 use App\Domain\Model\CreateUserModel;
 use App\Domain\Service\ModelFactory;
 use App\Domain\Service\UserService;
-use App\Domain\ValueObject\CommunicationChannelEnum;
 
 class Manager
 {

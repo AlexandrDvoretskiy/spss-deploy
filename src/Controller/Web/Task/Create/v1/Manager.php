@@ -25,7 +25,7 @@ class Manager
         return new CreatedTaskDTO(
             $task->getId(),
             $task->getTitle(),
-            $task->getLesson(),
+            $task->getLessonInfo(),
             $task->getSkills(),
             $task->getMarks(),
             $task->getRanges(),
