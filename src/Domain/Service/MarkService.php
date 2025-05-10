@@ -3,15 +3,18 @@
 namespace App\Domain\Service;
 
 use App\Domain\Entity\Mark;
+use App\Domain\Event\MarkIsCreatedEvent;
 use App\Domain\Model\CreateMarkModel;
 use App\Infrastructure\Repository\MarkRepository;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class MarkService
 {
     public function __construct(
         private readonly MarkRepository $markRepository,
         private readonly UserService $userService,
-        private readonly TaskService $taskService
+        private readonly TaskService $taskService,
+        private readonly EventDispatcherInterface $eventDispatcher
     )
     {
     }
@@ -24,7 +27,15 @@ class MarkService
             $this->taskService->findById($createMarkModel->task),
         );
 
-        $this->markRepository->create($mark);
+        if ($this->markRepository->create($mark)) {
+            $this->eventDispatcher->dispatch(
+                new MarkIsCreatedEvent(
+                    $mark->getUser()["id"],
+                    $mark->getTask()["id"],
+                    $mark->getMark(),
+                )
+            );
+        }
 
         return $mark;
     }

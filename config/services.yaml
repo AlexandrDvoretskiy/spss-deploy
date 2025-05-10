@@ -30,3 +30,26 @@ services:
     App\Application\Security\AuthService:
         arguments:
             $tokenTTL: '%env(JWT_TTL_SEC)%'
+
+    App\Controller\Web\User\Create\v2\ManagerLoggerDecorator:
+        decorates: App\Controller\Web\User\Create\v2\Manager
+
+    App\Controller\Web\Lesson\Create\v1\ManagerLoggerDecorator:
+        arguments:
+            $manager: '@App\Controller\Web\Lesson\Create\v1\Manager'
+
+    App\Controller\Web\Lesson\Create\v1\ManagerInterface:
+        alias: App\Controller\Web\Lesson\Create\v1\ManagerLoggerDecorator
+
+    App\Domain\Storage\MetricsStorageInterface:
+        class: App\Infrastructure\Storage\MetricsStorage
+        arguments:
+            - graphite
+            - 8125
+            - my_app
+
+    App\Infrastructure\Storage\MetricsStorage:
+        arguments:
+            - graphite
+            - 8125
+            - my_app

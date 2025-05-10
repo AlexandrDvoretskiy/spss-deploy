@@ -14,11 +14,11 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class Controller
 {
     public function __construct(
-        private readonly Manager $manager,
+        private readonly ManagerInterface $manager,
     ) {
     }
 
-    #[IsGranted("ROLE_ADMIN")]
+    // #[IsGranted("ROLE_ADMIN")]
     #[Route(path: 'api/lesson/v1/', methods: ['POST'])]
     public function __invoke(#[MapRequestPayload] CreateLessonDTO $createLessonDTO): CreatedLessonDTO
     {

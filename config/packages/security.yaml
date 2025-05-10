@@ -23,17 +23,9 @@ security:
             pattern: ^/api-platform$
             security: false
         main:
-            security: false
             lazy: true
             stateless: true
             custom_authenticator: App\Application\Security\JwtAuthenticator
-#            lazy: true
-#            provider: app_user_provider
-#            form_login:
-#                login_path: app_login
-#                check_path: app_login
-#                enable_csrf: true
-#                default_target_path: app_web_user_get_v1__invoke
 
             # activate different ways to authenticate
             # https://symfony.com/doc/current/security.html#the-firewall
@@ -44,6 +36,7 @@ security:
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
     access_control:
+        - { path: ^/test, roles: ROLE_USER }
         # - { path: ^/admin, roles: ROLE_ADMIN }
         # - { path: ^/profile, roles: ROLE_USER }
 
