@@ -34,4 +34,16 @@ class LessonRepository extends AbstractRepository
 
         return false;
     }
+
+    public function getList(int $page, int $perPage): array
+    {
+        $queryBuilder = $this->entityManager->createQueryBuilder();
+        $queryBuilder->select('l')
+            ->from(Lesson::class, 'l')
+            ->orderBy('l.id', 'ASC')
+            ->setFirstResult(($page - 1) * $perPage)
+            ->setMaxResults($perPage);
+
+        return $queryBuilder->getQuery()->enableResultCache(null, "lesson_{$page}_$perPage")->getResult();
+    }
 }

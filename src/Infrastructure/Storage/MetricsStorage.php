@@ -9,9 +9,14 @@ use Domnikl\Statsd\Connection\UdpSocket;
 class MetricsStorage implements MetricsStorageInterface
 {
     public const TASK_CREATED = 'task_created';
+
     public const TASK_DELETED = 'task_deleted';
 
     private const MARK_CREATED = 'mark_created';
+
+    public const CACHE_HIT_PREFIX = 'cache.hit.';
+
+    public const CACHE_MISS_PREFIX = 'cache.miss.';
 
     private const DEFAULT_SAMPLE_RATE = 1.0;
 

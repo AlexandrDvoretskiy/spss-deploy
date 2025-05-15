@@ -49,4 +49,17 @@ class TaskRepository extends AbstractRepository
         return $queryBuilder->getQuery()->execute();
     }
 
+    public function getTasksPaginated(int $page, int $perPage): array
+    {
+        $db = $this->entityManager->createQueryBuilder();
+        $db->select('t')
+            ->from(Task::class, 't')
+            ->orderBy('t.id', 'ASC')
+            ->setFirstResult(($page - 1) * $perPage)
+            ->setMaxResults($perPage);
+
+        // кэширование результата запроса
+        return $db->getQuery()->enableResultCache(null, "tasks_{$page}_$perPage")->getResult();
+    }
+
 }

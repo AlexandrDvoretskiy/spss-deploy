@@ -31,7 +31,7 @@ services:
         arguments:
             $tokenTTL: '%env(JWT_TTL_SEC)%'
 
-    App\Controller\Web\User\Create\v2\ManagerLoggerDecorator:
+    App\Controller\Web\User\Create\v2\ManagerLoggerDecorator: # Этот класс будет расширять функциональность Manager класса
         decorates: App\Controller\Web\User\Create\v2\Manager
 
     App\Controller\Web\Lesson\Create\v1\ManagerLoggerDecorator:
@@ -53,3 +53,46 @@ services:
             - graphite
             - 8125
             - my_app
+
+    # TaskRepositoryInterface - интерфейс, который определен в слое Домена
+    # TweetRepositoryCacheDecorator - реализация этого интерфейса, которая находится в слое Инфраструктуры
+
+    # ? Не понимаю почему, но без этой записи, все работает без проблем - получение списка и его кеширование
+    # ? Просто закоментировал и почистил кеш (приложения) - все работает
+    # ? Возможно, связано с изменением способа внедрения нового интерфейса в TaskService
+    App\Domain\Repository\TaskRepositoryInterface:
+        alias: App\Infrastructure\Repository\TaskRepositoryCacheDecorator
+
+    # Redis Cache
+
+    redis_client:
+        class: Redis
+        factory: Symfony\Component\Cache\Adapter\RedisAdapter::createConnection
+        arguments:
+            - '%env(REDIS_DSN)%'
+
+    redis_adapter:
+        class: Symfony\Component\Cache\Adapter\RedisAdapter
+        arguments:
+            - '@redis_client'
+            - 'my_app'
+
+    App\Application\Symfony\AdapterCountingDecorator:
+        arguments:
+            $adapter: '@redis_adapter'
+
+    App\Infrastructure\Repository\TaskRepositoryCacheDecorator:
+        arguments:
+            $cacheItemPool: '@App\Application\Symfony\AdapterCountingDecorator'
+
+    # Tag Cache
+
+    redis_tag_aware_adapter:
+        class: Symfony\Component\Cache\Adapter\RedisTagAwareAdapter
+        arguments:
+            - '@redis_client'
+            - 'my_app'
+
+    App\Infrastructure\Repository\LessonRepositoryCacheDecorator:
+        arguments:
+            $cache: '@redis_tag_aware_adapter'
