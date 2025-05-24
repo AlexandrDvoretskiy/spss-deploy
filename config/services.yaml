@@ -96,3 +96,13 @@ services:
     App\Infrastructure\Repository\LessonRepositoryCacheDecorator:
         arguments:
             $cache: '@redis_tag_aware_adapter'
+
+    # Queue
+
+    App\Infrastructure\Bus\RabbitMqBus:
+        calls:
+            - [ 'registerProducer', [ !php/enum App\Infrastructure\Bus\AmqpExchangeEnum::AddSkills, '@old_sound_rabbit_mq.add_skills_producer' ] ]
+
+    App\Controller\Amqp\AddSkills\Consumer:
+        arguments:
+            $key: 'rabbitmq.skills.add'
