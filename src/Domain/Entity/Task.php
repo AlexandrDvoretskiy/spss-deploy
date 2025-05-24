@@ -2,6 +2,12 @@
 
 namespace App\Domain\Entity;
 
+use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Metadata\ApiFilter;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\GraphQl\QueryCollection;
+use App\Domain\ApiPlatform\GraphQL\Resolver\TaskCollectionResolver;
 use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -11,6 +17,14 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity]
 #[ORM\HasLifecycleCallbacks]
 #[ORM\Index(name: 'task__lesson_id__ind', columns: ['lesson_id'])]
+#[ApiResource(
+    graphQlOperations: [
+        new QueryCollection(),
+        new QueryCollection(resolver: TaskCollectionResolver::class, name: 'protected'),
+    ]
+)]
+#[ApiFilter(SearchFilter::class, properties: ['title' => 'partial'])]
+#[ApiFilter(OrderFilter::class, properties: ['id', 'title'])]
 class Task implements EntityInterface
 {
     #[ORM\Column(name: 'id', type: 'bigint', unique: true)]
@@ -24,9 +38,6 @@ class Task implements EntityInterface
     #[ORM\ManyToOne(targetEntity: Lesson::class , inversedBy: 'tasks')]
     #[ORM\JoinColumn(name: 'lesson_id', referencedColumnName: 'id')]
     private Lesson $lesson;
-
-    #[ORM\OneToMany(targetEntity: Skill::class, mappedBy: 'task')]
-    private Collection $skills;
 
     #[ORM\OneToMany(targetEntity: Mark::class, mappedBy: 'task')]
     private Collection $marks;
@@ -48,7 +59,6 @@ class Task implements EntityInterface
         $this->title = $title;
         $this->lesson = $lesson;
 
-        $this->skills = new ArrayCollection();
         $this->marks = new ArrayCollection();
         $this->ranges = new ArrayCollection();
         $this->createdAt = new DateTime();
@@ -93,8 +103,7 @@ class Task implements EntityInterface
         return [
             'id' => $this->id,
             'title' => $this->title,
-            'lesson' => $this->getLesson(),
-            'skills' => array_map(static fn(Skill $skill) => $skill->toArray(), $this->skills->toArray()),
+            'lesson' => $this->getLessonInfo(),
             'ranges' => array_map(static fn(SkillRange $range) => $range->toArray(), $this->ranges->toArray()),
             'createdAt' => $this->createdAt->format('Y-m-d H:i:s'),
             'updatedAt' => $this->updatedAt->format('Y-m-d H:i:s'),
@@ -106,8 +115,7 @@ class Task implements EntityInterface
         return [
             'id' => $this->id,
             'title' => $this->title,
-            'lesson' => $this->getLesson(),
-            // 'skills' => array_map(static fn(Skill $skill) => $skill->toArray(), $this->skills->toArray()),
+            'lesson' => $this->getLessonInfo(),
             // 'ranges' => array_map(static fn(SkillRange $range) => $range->toArray(), $this->ranges->toArray()),
             'createdAt' => $this->createdAt->format('Y-m-d H:i:s'),
             'updatedAt' => $this->updatedAt->format('Y-m-d H:i:s'),
@@ -117,9 +125,9 @@ class Task implements EntityInterface
     /**
      * @return Lesson
      */
-    public function getLesson(): array
+    public function getLesson(): Lesson
     {
-        return $this->lesson->getInfo();
+        return $this->lesson;
     }
 
     public function addSkill(Skill $skill): void
@@ -179,5 +187,10 @@ class Task implements EntityInterface
         if (!$this->ranges->contains($range)) {
             $this->ranges->add($range);
         }
+    }
+
+    public function getLessonInfo(): array
+    {
+        return $this->lesson->getInfo();
     }
 }

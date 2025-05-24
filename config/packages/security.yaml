@@ -19,7 +19,11 @@ security:
         token:
             pattern: ^/api/get-token/v1/
             security: false
+        apiPlatform:
+            pattern: ^/api-platform$
+            security: false
         main:
+            security: false
             lazy: true
             stateless: true
             custom_authenticator: App\Application\Security\JwtAuthenticator
@@ -46,7 +50,7 @@ security:
     role_hierarchy:
         ROLE_ADMIN: [ROLE_VIEW, ROLE_EDIT]
         ROLE_EDIT: ROLE_VIEW
-        ROLE_USER: ROLE_VIEW
+        ROLE_VIEW: ROLE_USER
 
 when@test:
     security:
