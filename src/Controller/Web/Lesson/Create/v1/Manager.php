@@ -4,13 +4,11 @@ namespace App\Controller\Web\Lesson\Create\v1;
 
 use App\Controller\Web\Lesson\Create\v1\Input\CreateLessonDTO;
 use App\Controller\Web\Lesson\Create\v1\Output\CreatedLessonDTO;
-use App\Domain\Entity\Lesson;
 use App\Domain\Model\CreateLessonModel;
-
 use App\Domain\Service\ModelFactory;
 use App\Domain\Service\LessonService;
 
-class Manager
+class Manager implements ManagerInterface
 {
     public function __construct(
         /** @var ModelFactory<CreateLessonModel> */

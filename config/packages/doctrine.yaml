@@ -1,3 +1,21 @@
+services:
+    doctrine_memcached_provider: # сервис будет использоваться в качестве провайдера кеша для Doctrine
+        class: Memcached # представляет собой экземпляр класса Memcached
+        factory: Symfony\Component\Cache\Adapter\MemcachedAdapter::createConnection # создается с использованием фабричного метода
+        arguments:
+            - '%env(MEMCACHED_DSN)%'
+            - PREFIX_KEY: 'my_app_doctrine'
+
+framework:
+    cache:
+        pools: # позволяет определять различные пулы кеша для хранения данных в приложении
+            doctrine.result_cache_pool: # имя пула кеша
+                adapter: cache.adapter.memcached # использование адаптера кеша Memcached
+                provider: doctrine_memcached_provider # в качестве провайдера кеша используется сервис
+            doctrine.system_cache_pool:
+                adapter: cache.adapter.memcached
+                provider: doctrine_memcached_provider
+
 doctrine:
     dbal:
         url: '%env(resolve:DATABASE_URL)%'
@@ -27,6 +45,15 @@ doctrine:
                 alias: App
         controller_resolver:
             auto_mapping: false
+        metadata_cache_driver: # Метаданные Doctrine включают информацию о структуре таблиц базы данных
+            type: pool
+            pool: doctrine.system_cache_pool
+        query_cache_driver: # помогает избежать выполнения одних и тех же запросов к базе данных
+            type: pool
+            pool: doctrine.system_cache_pool
+        result_cache_driver: # механизм кэширования результатов запросов
+            type: pool
+            pool: doctrine.result_cache_pool
 
 when@test:
     doctrine:

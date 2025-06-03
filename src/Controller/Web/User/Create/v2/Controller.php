@@ -17,7 +17,7 @@ class Controller
     ) {
     }
 
-    #[IsGranted("ROLE_ADMIN")]
+//    #[IsGranted("ROLE_ADMIN")]
     #[Route(path: 'api/user/v2/', methods: ['POST'])]
     public function __invoke(#[MapRequestPayload] CreateUserDTO $createUserDTO): CreatedUserDTO
     {

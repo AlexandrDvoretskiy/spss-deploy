@@ -130,29 +130,6 @@ class Task implements EntityInterface
         return $this->lesson;
     }
 
-    public function addSkill(Skill $skill): void
-    {
-        if (!$this->skills->contains($skill)) {
-            $this->skills->add($skill);
-        }
-    }
-
-    /**
-     * @return Collection
-     */
-    public function getSkills(): array
-    {
-        return array_map(static fn(Skill $skill) => $skill->toArray(), $this->skills->toArray());
-    }
-
-    /**
-     * @param Collection $skills
-     */
-    public function setSkills(Collection $skills): void
-    {
-        $this->skills = $skills;
-    }
-
     /**
      * @return Collection
      */

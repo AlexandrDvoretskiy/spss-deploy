@@ -26,10 +26,8 @@ class Manager
             $task->getId(),
             $task->getTitle(),
             $task->getLessonInfo(),
-            $task->getSkills(),
             $task->getMarks(),
             $task->getRanges(),
-            $task->getSkillResults(),
             $task->getCreatedAt()->format("d.m.Y H:i:s"),
             $task->getUpdatedAt()->format("d.m.Y H:i:s"),
         );
