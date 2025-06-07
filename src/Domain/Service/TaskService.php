@@ -61,22 +61,10 @@ class TaskService
             return $this->findById($id)->toArray();
         }
 
-        return []; // Не уверен, что так можно делать
+        return [];
     }
 
     /**
-     * ? Тут не совсем понял, как нужно заменить TaskRepository на TaskRepositoryInterface и не сломать
-     * ? все ранее выполненные методы.
-     *
-     * Ведь в TaskRepositoryInterface нет методов find(), deleteTaskIfExists() и тд
-     * Их все нужно в Интерфейсе указывать, и реализовывать в TaskRepositoryCacheDecorator просто вызовом "род" метода,
-     * как с методом create() ?
-     *
-     * Решил тут внедрить новый репозиторий не заменяя старый, и вызываю только в этом методе
-     *
-     * Как сделать правильно?
-     * В LessonService сделал по такому же принципу, но на примере тегированного кеша
-     *
      * @param int $page
      * @param int $perPage
      * @return array
