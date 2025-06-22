@@ -40,7 +40,7 @@ class SkillResultService
         return $this->skillResultRepository->deleteSkillResultIfExists($id);
     }
 
-    public function addByMark(SkillResultByMarkDTO $skillResultByMarkDTO): array|null
+    public function addByMark(SkillResultByMarkDTO $skillResultByMarkDTO): void
     {
         $skillRanges = $this->skillRangeService->findByTaskId($skillResultByMarkDTO->taskId);
 
@@ -55,35 +55,8 @@ class SkillResultService
                 );
 
                 $this->skillResultRepository->create($skillResult);
-
-                /**
-                 * Изначально сделал так, чтобы данный метод возвращал void
-                 * Т.к. метод вызывается в событии Диспатчера и возвращать ничего не нужно
-                 * Сохранили оценку по Заданию - посчитали процент развития Скилов и сохранили
-                 *
-                 * Но после того как начал писать Юнит Тест по нему понял, что проверять нечего, т.к. он ничего не возвращает
-                 * По идее, единственное что могу проверить это методы, какие были вызваны, и их кол-во (Это есть в тестах)
-                 *
-                 * Как поступить правильно поступать в таких случаях?
-                 * Сейчас решил вернуть просто массив, чтобы проверять хоть что-то
-                 */
-
-                $data[] = [
-                    "SKILL_RANGE" => [
-                        "ID" =>  $skillRange->id,
-                        "RANGE" =>  $skillRange->range,
-                    ],
-                    "RESULT" => [
-                        "VALUE" => $result
-                    ],
-                    "MARK" => [
-                        "VALUE" => $skillResultByMarkDTO->mark
-                    ]
-                ];
             }
         }
-
-        return $data ?? null;
     }
 
     public function calculateResult(int $range, int $mark): int|float

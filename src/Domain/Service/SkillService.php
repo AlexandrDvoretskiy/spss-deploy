@@ -20,6 +20,10 @@ class SkillService
 
     public function create(CreateSkillModel $createSkillModel): Skill
     {
+        if (empty($createSkillModel->title)) {
+            throw new \InvalidArgumentException("Title cannot be empty");
+        }
+
         $skill = new Skill(
             $createSkillModel->title
         );
