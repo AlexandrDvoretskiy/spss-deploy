@@ -87,8 +87,8 @@ class SkillRange implements EntityInterface
     {
         return [
             'id' => $this->id,
-             'skill' => $this->getSkill(),
-             'task' => $this->getTask(),
+            'skill' => $this->getSkill(),
+            'task' => $this->getTask(),
             'range' => $this->range,
             'createdAt' => $this->createdAt->format('Y-m-d H:i:s'),
             'updatedAt' => $this->updatedAt->format('Y-m-d H:i:s'),

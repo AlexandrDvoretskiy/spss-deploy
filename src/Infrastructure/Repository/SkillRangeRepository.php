@@ -48,5 +48,20 @@ class SkillRangeRepository extends AbstractRepository
         return $queryBuilder->getQuery()->execute();
     }
 
+    public function findByTaskId(int $taskId): array
+    {
+        $queryBuilder = $this->entityManager->createQueryBuilder();
+
+        $queryBuilder->select('sr.id', 's.id AS skill', 'sr.range')
+            ->from(SkillRange::class, 'sr')
+            ->join('sr.skill', 's')
+            ->where(
+                $queryBuilder->expr()->eq('sr.task', ':taskId')
+            )
+            ->setParameter('taskId', $taskId)
+            ->orderBy('sr.id', 'ASC');
+
+        return $queryBuilder->getQuery()->enableResultCache(null, "skill_range_{$taskId}")->getResult();
+    }
 
 }

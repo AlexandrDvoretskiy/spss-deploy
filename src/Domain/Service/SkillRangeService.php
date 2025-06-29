@@ -2,6 +2,7 @@
 
 namespace App\Domain\Service;
 
+use App\Domain\DTO\SkillRangeByMark;
 use App\Domain\Entity\SkillRange;
 use App\Domain\Model\CreateSkillRangeModel;
 use App\Infrastructure\Repository\SkillRangeRepository;
@@ -47,5 +48,17 @@ class SkillRangeService
         }
 
         return ["success" => false];
+    }
+
+    public function findByTaskId(int $taskId): array
+    {
+        return array_map(
+            static fn(array $skillRange) => new SkillRangeByMark(
+                $skillRange['id'],
+                $skillRange["skill"],
+                $skillRange["range"]
+            ),
+            $this->skillRangeRepository->findByTaskId($taskId)
+        );
     }
 }

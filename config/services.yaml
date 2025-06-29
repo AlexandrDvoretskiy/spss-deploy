@@ -57,9 +57,6 @@ services:
     # TaskRepositoryInterface - интерфейс, который определен в слое Домена
     # TweetRepositoryCacheDecorator - реализация этого интерфейса, которая находится в слое Инфраструктуры
 
-    # ? Не понимаю почему, но без этой записи, все работает без проблем - получение списка и его кеширование
-    # ? Просто закоментировал и почистил кеш (приложения) - все работает
-    # ? Возможно, связано с изменением способа внедрения нового интерфейса в TaskService
     App\Domain\Repository\TaskRepositoryInterface:
         alias: App\Infrastructure\Repository\TaskRepositoryCacheDecorator
 
