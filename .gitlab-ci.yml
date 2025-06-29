@@ -17,4 +17,4 @@ deploy_server1:
       cd demo &&
       sh ./deploy.sh $SERVER1 $DATABASE_HOST $DATABASE_USER $DATABASE_PASSWORD $DATABASE_NAME $RABBITMQ_HOST $RABBITMQ_USER $RABBITMQ_PASSWORD"
   only:
-    - main
+    - ADvoretskiy/main
