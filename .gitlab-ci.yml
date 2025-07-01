@@ -15,6 +15,6 @@ deploy_server1:
       git clone https://github.com/AlexandrDvoretskiy/spss-deploy.git demo &&
       sudo chown www-data:www-data demo -R &&
       cd demo &&
-      sh ./deploy.sh $SERVER1 $DATABASE_HOST $DATABASE_USER $DATABASE_PASSWORD $DATABASE_NAME $RABBITMQ_HOST $RABBITMQ_USER $RABBITMQ_PASSWORD"
+      sh ./deploy/deploy.sh $SERVER1 $DATABASE_HOST $DATABASE_USER $DATABASE_PASSWORD $DATABASE_NAME $RABBITMQ_HOST $RABBITMQ_USER $RABBITMQ_PASSWORD"
   only:
     - ADvoretskiy/main
