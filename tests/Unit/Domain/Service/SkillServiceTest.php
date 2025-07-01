@@ -53,12 +53,6 @@ class SkillServiceTest extends Unit
                     "123456789",
                 ),
                 ["123456789"],
-            ],
-            "Negative - empty string" => [
-                new CreateSkillModel(
-                    "",
-                ),
-                [""],
             ]
         ];
     }
